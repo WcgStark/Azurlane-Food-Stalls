@@ -32,7 +32,7 @@ POINTS_BY_CORRECT    = {3: 5, 2: 2, 1: 1, 0: 0}
 CLICK_DELAY          = 0.18   # pausa após cada clique
 SELECT_SETTLE        = 0.35   # espera a grade assentar antes de clicar (anti-animação)
 MOVE_DURATION        = 0.08   # duração do movimento do mouse (clique mais confiável)
-LOBBY_CREDITS_TO_ADD = 0      # 0 = vai direto no START GAME sem adicionar créditos
+LOBBY_CREDITS_TO_ADD = 5      # clica "+1" nos créditos N vezes antes do START (máx 5)
 DEBUG_SAVE           = False  # True → salva imagens de debug (útil para diagnosticar)
 
 WINDOW_KEYWORDS = ('Android Device', 'BlueStacks', 'NoxPlayer', 'LDPlayer', 'MuMu')
@@ -79,6 +79,7 @@ class MemoryBot:
         self.ref_start_game = None
         self.ref_credits    = None
         self.ref_continue   = None
+        self.ref_quit       = None
         self._continue_pos  = None
         self._in_game       = False
         self._orb           = cv2.ORB_create(nfeatures=ORB_FEATURES)
@@ -109,6 +110,9 @@ class MemoryBot:
             if p.exists():
                 m = self._imread_unicode(p)
                 setattr(self, attr, cv2.cvtColor(m, cv2.COLOR_BGR2GRAY))
+        # Opcional: template do botão Quit (se não houver, usa espelho do Continue)
+        if Path("botao para quit.png").exists():
+            self.ref_quit = self._imread_unicode("botao para quit.png")
 
     def find_window(self) -> bool:
         hits = []
@@ -232,6 +236,19 @@ class MemoryBot:
         if self.ref_continue is None:
             return None
         return self._find_in_frame(self.ref_continue, frame, threshold=0.68)
+
+    def _find_quit(self, frame):
+        """Quit fica no mesmo modal do Continue, simétrico em torno do centro.
+        Usa o template quit.png se existir; senão, espelha a posição do Continue."""
+        if self.ref_quit is not None:
+            pos = self._find_in_frame(self.ref_quit, frame, threshold=0.68)
+            if pos is not None:
+                return pos
+        cont = self._continue_pos or self._find_continue(frame)
+        if cont is not None:
+            l, t, r, b = self.win
+            return ((l + r) - cont[0], cont[1])   # espelho horizontal no centro da janela
+        return None
 
     # ── Memorização ───────────────────────────────────────────────────────────
 
@@ -471,7 +488,14 @@ class MemoryBot:
                       f"(total: {self.points}/{POINTS_TARGET})")
 
                 if self.points >= POINTS_TARGET:
-                    print(f"\n✓ Meta de {POINTS_TARGET} pontos atingida! Encerrando.")
+                    print(f"\n✓ Meta de {POINTS_TARGET} pontos atingida! Clicando QUIT.")
+                    qpos = self._find_quit(rframe)
+                    if qpos is not None:
+                        print(f"  QUIT → {qpos}")
+                        self.click(*qpos)
+                    else:
+                        print("  QUIT (posição fixa, não localizado)")
+                        self.press_quit()
                     return
 
                 pos = self._continue_pos or self._find_continue(self.grab())

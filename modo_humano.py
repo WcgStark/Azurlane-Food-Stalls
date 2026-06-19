@@ -23,13 +23,15 @@ import bot
 from bot import MemoryBot
 
 # ─── Faixas de aleatoriedade (segundos / pixels) ──────────────────────────────
-REACTION        = (0.5, 1.3)    # "ver" a grade antes de agir (também deixa assentar)
-MOVE_DUR        = (0.18, 0.50)  # duração do movimento do mouse até a comida
-DWELL           = (0.04, 0.14)  # pausa parado antes de pressionar
-BETWEEN_CLICKS  = (0.28, 0.70)  # intervalo normal entre um clique e o próximo
-JITTER_PX       = 14            # variação máxima da posição do clique (± px)
-LONG_PAUSE_PROB = 0.12          # chance de uma pausa maior, como se distraísse
-LONG_PAUSE      = (0.8, 2.0)
+# Ajustado para RAPIDEZ + PRECISÃO (o jogo tem tempo limite por rodada), mas
+# mantendo variação suficiente para não parecer robótico.
+REACTION        = (0.22, 0.55)  # "ver" a grade antes de agir (também deixa assentar)
+MOVE_DUR        = (0.10, 0.24)  # duração do movimento do mouse até a comida
+DWELL           = (0.02, 0.07)  # pausa parado antes de pressionar
+BETWEEN_CLICKS  = (0.10, 0.26)  # intervalo normal entre um clique e o próximo
+JITTER_PX       = 7             # variação máxima da posição do clique (± px) — mais preciso
+LONG_PAUSE_PROB = 0.06          # chance baixa de uma pausa maior, como se hesitasse
+LONG_PAUSE      = (0.35, 0.75)
 # ──────────────────────────────────────────────────────────────────────────────
 
 
