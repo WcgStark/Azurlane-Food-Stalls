@@ -69,8 +69,3 @@ Key constants at the top of `bot.py`:
 - `DEBUG_SAVE` – set `True` to dump debug images for diagnosing.
 
 Human-mode timing/precision ranges live at the top of `modo_humano.py`.
-
-## Disclaimer
-
-Automation generally violates the game's Terms of Service. Use at your own risk.
-Educational project about computer vision and UI automation.
