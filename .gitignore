@@ -1,0 +1,12 @@
+# Ambiente virtual
+.venv/
+__pycache__/
+*.pyc
+
+# Saídas de runtime / debug
+debug_*.png
+sample_*.png
+result_*.png
+calibrate_output.png
+diag_log.txt
+diag_phase_*.png
